@@ -65,15 +65,19 @@ public class StateMachine : MonoBehaviour
 
         while(state == State.Patrol) // "Update loop"
         {
-            transform.rotation *= Quaternion.Euler(0f, 50f * Time.deltaTime, 0f);
+            
+            
             //Direction from A to B
             //B - A, B being the player position and A being the AI.
             Vector3 directionToPlayer = player.transform.position - transform.position;
             directionToPlayer.Normalize();
             //Dot Product parameters should be "normalized" 
             float result = Vector3.Dot(transform.forward, directionToPlayer);
-
-            if(result >= 0.95f)
+            float angle = Vector3.SignedAngle(transform.forward, directionToPlayer, Vector3.up);
+            bool direction = angle > 0f;
+            transform.rotation *= Quaternion.Euler(0f, (direction ? 50f : -50f) * Time.deltaTime, 0f);
+            Debug.Log(result);
+            if (result >= 0.9f)
             {
                 state = State.Chasing;
             }
