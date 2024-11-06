@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     private float lastGroundedTime = float.NegativeInfinity;
 
     private bool isGrounded;
-
+    public float airControlMultiplier = 1.6f;
     Vector3 dampVelocity;
     Vector2 airDampVelocity;
     public Rigidbody rb;
@@ -63,17 +63,23 @@ public class PlayerController : MonoBehaviour
         if (isGrounded)
         {
             rb.velocity = Vector3.SmoothDamp(rb.velocity, new Vector3(input.x, rb.velocity.y, input.z), ref dampVelocity, 0.1f);
+
+            airDampVelocity = Vector2.zero;
         }
         else
         {
-            float airControl = 1.6f;
-            rb.AddForce(new Vector3(input.x, 0f, input.y) * airControl, ForceMode.Acceleration);
+            
+            dampVelocity = Vector3.zero;
+            rb.AddForce(new Vector3(input.x, 0f, input.z) * airControlMultiplier, ForceMode.Acceleration);
             Vector2 xzMovement = new Vector2(rb.velocity.x, rb.velocity.z);
-            xzMovement = Vector2.SmoothDamp(xzMovement, xzMovement.normalized * maxSpeed, ref airDampVelocity, 0.1f);
-                //Vector2.ClampMagnitude(xzMovement, maxSpeed);
-            rb.velocity = new Vector3(xzMovement.x, rb.velocity.y, xzMovement.y);
-        }
+            if (rb.velocity.magnitude > maxSpeed)
+            {
+                xzMovement = Vector2.SmoothDamp(xzMovement, xzMovement.normalized * maxSpeed,
+                                                ref airDampVelocity, 0.1f);
 
+                rb.velocity = new Vector3(xzMovement.x, rb.velocity.y, xzMovement.y);
+            }
+        }
         
     }
 
