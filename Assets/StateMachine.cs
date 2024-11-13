@@ -76,7 +76,7 @@ public class StateMachine : MonoBehaviour
             float angle = Vector3.SignedAngle(transform.forward, directionToPlayer, Vector3.up);
             bool direction = angle > 0f;
             transform.rotation *= Quaternion.Euler(0f, (direction ? 50f : -50f) * Time.deltaTime, 0f);
-            Debug.Log(result);
+            //Debug.Log(result);
             if (result >= 0.9f)
             {
                 state = State.Chasing;
