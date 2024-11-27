@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
+using UnityEngine.AI;
 
+[RequireComponent(typeof(Rigidbody))]
 public class StateMachine : MonoBehaviour
 {
     public enum State
@@ -12,24 +15,26 @@ public class StateMachine : MonoBehaviour
         Attack,
         Captured,
     }
-
+    protected NavMeshAgent _Agent;
+    protected float _Range = 500f;
     public State state;
 
-    PlayerController player;
+    protected CustomPlayerMovement player;
 
-    Rigidbody rb;
-    private void Awake()
+    protected Rigidbody rb;
+    protected void Awake()
     {
-        player = FindObjectOfType<PlayerController>();
+        _Agent = GetComponent<NavMeshAgent>();
+        player = FindObjectOfType<CustomPlayerMovement>();
         rb = GetComponent<Rigidbody>();
     }
 
-    private void Start()
+    protected virtual void Start()
     {
         NextState();
     }
 
-    private void NextState()
+    protected virtual void NextState()
     {
         switch (state)
         {
@@ -57,7 +62,7 @@ public class StateMachine : MonoBehaviour
         }
     }
 
-    IEnumerator PatrolState()
+    protected virtual IEnumerator PatrolState()
     {
         //Setup/entry point / Start()/Awake()
         Debug.Log("Entering Patrol State");
@@ -81,7 +86,16 @@ public class StateMachine : MonoBehaviour
             {
                 state = State.Chasing;
             }
+            //if ai is still moving
+            /*if (_Agent.pathPending || !_Agent.isOnNavMesh || _Agent.remainingDistance > 0.1f)
+            {
+                yield return null;
+            }
 
+            //Choose a random point
+            Vector3 randomPosition = _Range * Random.insideUnitCircle;
+            randomPosition = new Vector3(randomPosition.x, 0, randomPosition.z);
+            _Agent.destination = transform.position + randomPosition;*/
 
 
             yield return null; // Wait for a frame
@@ -93,7 +107,7 @@ public class StateMachine : MonoBehaviour
         NextState();
     }
 
-    IEnumerator InvestigatingState()
+    protected virtual IEnumerator InvestigatingState()
     {
         //Setup/entry point / Start()/Awake()
         Debug.Log("Entering Investigating State");
@@ -115,7 +129,7 @@ public class StateMachine : MonoBehaviour
         NextState();
     }
 
-    IEnumerator ChasingState()
+    protected virtual IEnumerator ChasingState()
     {
         //Setup/entry point / Start()/Awake()
         Debug.Log("Entering Chase State");
@@ -139,10 +153,12 @@ public class StateMachine : MonoBehaviour
 
             if (angle > 0)
             {
+                _Agent.destination = player.transform.forward;
                 transform.rotation *= Quaternion.Euler(0f, 50f * Time.deltaTime, 0f);
             }
             else
             {
+                _Agent.destination = player.transform.forward;
                 transform.rotation *= Quaternion.Euler(0f, -50f  * Time.deltaTime, 0f);
             }
 
@@ -169,7 +185,7 @@ public class StateMachine : MonoBehaviour
         NextState();
     }
 
-    IEnumerator AttackState()
+    protected virtual IEnumerator AttackState()
     {
         //Setup/entry point / Start()/Awake()
         Debug.Log("Entering Attack State");
@@ -195,7 +211,7 @@ public class StateMachine : MonoBehaviour
         NextState();
     }
 
-    IEnumerator CapturedState()
+    protected virtual IEnumerator CapturedState()
     {
         //Setup/entry point / Start()/Awake()
         Debug.Log("Entering Captured State");
@@ -210,5 +226,52 @@ public class StateMachine : MonoBehaviour
         //tear down/ exit point / OnDestroy()
         Debug.Log("Exiting Captured State");
         NextState();
+    }
+
+    protected float[] EQS()
+    {
+        /* I need a list to add each point to it 
+         * This list just needs the Vector3 from the hit
+         * 
+         * I need to cast a line trace from the player
+         * This trace will create points along the path 
+         * These points will have a value assigned to them, the higher the value the further it is from the player
+         * the points closet to the AI will have a higher value
+         * To determine the value I'll subtract the value if it's too far away from the AI
+         * 
+         */
+        
+        List<Vector3> points = new List<Vector3>();
+        List<float> value = new List<float>();
+        RaycastHit hit;
+        float range = 100f;
+        for(int i  = 0; i < 4; i++)
+        {
+            Physics.Raycast(player.transform.position, transform.forward, out hit, range);
+            if(hit.collider != null)
+            {
+                points.Add(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z + range));
+                range -= 25f;
+            }
+            else
+            {
+                points.Add(hit.point);
+                range -= 25f;
+            }
+            
+        }
+        foreach (var point in points)
+        {
+            value.Add(EQSValue(point));
+        }
+
+
+        Debug.Log(value.Capacity);
+        return value.ToArray();
+    }
+
+    protected float EQSValue(Vector3 point)
+    {
+        return point.magnitude - _Agent.transform.position.magnitude;
     }
 }
