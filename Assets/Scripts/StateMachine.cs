@@ -16,7 +16,7 @@ public class StateMachine : MonoBehaviour
         Captured,
     }
     protected NavMeshAgent _Agent;
-    protected float _Range = 500f;
+    protected float _Range = 100f;
     public State state;
 
     protected CustomPlayerMovement player;
@@ -80,22 +80,22 @@ public class StateMachine : MonoBehaviour
             float result = Vector3.Dot(transform.forward, directionToPlayer);
             float angle = Vector3.SignedAngle(transform.forward, directionToPlayer, Vector3.up);
             bool direction = angle > 0f;
-            transform.rotation *= Quaternion.Euler(0f, (direction ? 50f : -50f) * Time.deltaTime, 0f);
+            //transform.rotation *= Quaternion.Euler(0f, (direction ? 50f : -50f) * Time.deltaTime, 0f);
             //Debug.Log(result);
             if (result >= 0.9f)
             {
                 state = State.Chasing;
             }
             //if ai is still moving
-            /*if (_Agent.pathPending || !_Agent.isOnNavMesh || _Agent.remainingDistance > 0.1f)
+            if (_Agent.pathPending || !_Agent.isOnNavMesh || _Agent.remainingDistance > 0.1f)
             {
                 yield return null;
             }
 
             //Choose a random point
-            Vector3 randomPosition = _Range * Random.insideUnitCircle;
+            Vector3 randomPosition = _Range * Random.insideUnitSphere;
             randomPosition = new Vector3(randomPosition.x, 0, randomPosition.z);
-            _Agent.destination = transform.position + randomPosition;*/
+            _Agent.destination = transform.position + randomPosition;
 
 
             yield return null; // Wait for a frame
@@ -133,7 +133,7 @@ public class StateMachine : MonoBehaviour
     {
         //Setup/entry point / Start()/Awake()
         Debug.Log("Entering Chase State");
-
+        _Agent.destination = player.transform.position;
 
         while (state == State.Chasing) // "Update loop"
         {
@@ -144,6 +144,7 @@ public class StateMachine : MonoBehaviour
 
             float shimmy = Mathf.Cos(Time.time * 30f) * 10f + 30f;
             //Choose transform movement or rigidbody movement
+            //_Agent.destination = player.transform.forward;
             //transform.position += transform.right * shimmy * Time.deltaTime;
 
             Vector3 directionToPlayer = player.transform.position - transform.position;
@@ -153,18 +154,18 @@ public class StateMachine : MonoBehaviour
 
             if (angle > 0)
             {
-                _Agent.destination = player.transform.forward;
-                transform.rotation *= Quaternion.Euler(0f, 50f * Time.deltaTime, 0f);
+                //_Agent.destination = player.transform.forward;
+                //transform.rotation *= Quaternion.Euler(0f, 50f * Time.deltaTime, 0f);
             }
             else
             {
-                _Agent.destination = player.transform.forward;
-                transform.rotation *= Quaternion.Euler(0f, -50f  * Time.deltaTime, 0f);
+                
+                //transform.rotation *= Quaternion.Euler(0f, -50f  * Time.deltaTime, 0f);
             }
 
-            if(rb.velocity.magnitude < 5f)
+            if(rb.velocity.magnitude > 2f)
             {
-                rb.AddForce(transform.forward * shimmy, ForceMode.Acceleration);
+                //rb.AddForce(transform.forward * shimmy, ForceMode.Acceleration);
             }
 
             if(directionToPlayer.magnitude < 2f)
