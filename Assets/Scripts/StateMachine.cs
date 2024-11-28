@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.AI;
+using TMPro;
+using Unity.VisualScripting;
 
 [RequireComponent(typeof(Rigidbody))]
 public class StateMachine : MonoBehaviour
@@ -18,6 +20,8 @@ public class StateMachine : MonoBehaviour
     protected NavMeshAgent _Agent;
     protected float _Range = 100f;
     public State state;
+
+    [SerializeField] private TMP_Text aggressiveText;
 
     protected CustomPlayerMovement player;
 
@@ -36,6 +40,7 @@ public class StateMachine : MonoBehaviour
 
     protected virtual void NextState()
     {
+        GetState();
         switch (state)
         {
             case State.Patrol:
@@ -216,8 +221,9 @@ public class StateMachine : MonoBehaviour
     {
         //Setup/entry point / Start()/Awake()
         Debug.Log("Entering Captured State");
-
-
+        rb.freezeRotation = true;
+        rb.constraints = RigidbodyConstraints.FreezeAll;
+        _Agent.destination = transform.position;
         while (state == State.Captured) // "Update loop"
         {
             yield return null; // Wait for a frame
@@ -226,53 +232,36 @@ public class StateMachine : MonoBehaviour
 
         //tear down/ exit point / OnDestroy()
         Debug.Log("Exiting Captured State");
-        NextState();
+        //NextState();
     }
 
-    protected float[] EQS()
+    protected virtual void GetState()
     {
-        /* I need a list to add each point to it 
-         * This list just needs the Vector3 from the hit
-         * 
-         * I need to cast a line trace from the player
-         * This trace will create points along the path 
-         * These points will have a value assigned to them, the higher the value the further it is from the player
-         * the points closet to the AI will have a higher value
-         * To determine the value I'll subtract the value if it's too far away from the AI
-         * 
-         */
-        
-        List<Vector3> points = new List<Vector3>();
-        List<float> value = new List<float>();
-        RaycastHit hit;
-        float range = 100f;
-        for(int i  = 0; i < 4; i++)
+        switch (state)
         {
-            Physics.Raycast(player.transform.position, transform.forward, out hit, range);
-            if(hit.collider != null)
-            {
-                points.Add(new Vector3(player.transform.position.x, player.transform.position.y, player.transform.position.z + range));
-                range -= 25f;
-            }
-            else
-            {
-                points.Add(hit.point);
-                range -= 25f;
-            }
-            
+            case State.Patrol:
+                aggressiveText.text = "Agressive AI State: Patrolling";
+                break;
+            case State.Investigating:
+                aggressiveText.text = "Agressive AI State: Investigating";
+                break;
+            case State.Chasing:
+                aggressiveText.text = "Agressive AI State: Chasing";
+                break;
+            case State.Attack:
+                aggressiveText.text = "Agressive AI State: Attacking";
+                break;
+            case State.Captured:
+                aggressiveText.text = "Agressive AI State: Captured";
+                break;
+            default:
+                Debug.LogWarning("NO STATE ACTIVE");
+                break;
         }
-        foreach (var point in points)
-        {
-            value.Add(EQSValue(point));
-        }
-
-
-        Debug.Log(value.Capacity);
-        return value.ToArray();
     }
 
-    protected float EQSValue(Vector3 point)
+    public void Captured()
     {
-        return point.magnitude - _Agent.transform.position.magnitude;
+        state = State.Captured;
     }
 }

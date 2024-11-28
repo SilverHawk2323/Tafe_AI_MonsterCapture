@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class ScaredMonster : StateMachine
 {
+
+    [SerializeField] private TMP_Text passiveText;
+
     protected override IEnumerator ChasingState()
     {
         //Setup/entry point / Start()/Awake()
@@ -60,5 +64,30 @@ public class ScaredMonster : StateMachine
         //tear down/ exit point / OnDestroy()
         Debug.Log("Exiting Scared State");
         NextState();
+    }
+
+    protected override void GetState()
+    {
+        switch (state)
+        {
+            case State.Patrol:
+                passiveText.text = "Passive AI State: Patrolling";
+                break;
+            case State.Investigating:
+                passiveText.text = "Passive AI State: Investigating";
+                break;
+            case State.Chasing:
+                passiveText.text = "Passive AI State: Running";
+                break;
+            case State.Attack:
+                passiveText.text = "Passive AI State: Attacking";
+                break;
+            case State.Captured:
+                passiveText.text = "Passive AI State: Captured";
+                break;
+            default:
+                Debug.LogWarning("NO STATE ACTIVE");
+                break;
+        }
     }
 }
