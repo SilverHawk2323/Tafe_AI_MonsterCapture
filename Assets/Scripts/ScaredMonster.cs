@@ -11,7 +11,7 @@ public class ScaredMonster : StateMachine
     protected override IEnumerator ChasingState()
     {
         //Setup/entry point / Start()/Awake()
-        Debug.Log("Entering Scared State");
+        //Debug.Log("Entering Scared State");
 
 
         while (state == State.Chasing) // "Update loop"
@@ -62,7 +62,7 @@ public class ScaredMonster : StateMachine
 
 
         //tear down/ exit point / OnDestroy()
-        Debug.Log("Exiting Scared State");
+        //Debug.Log("Exiting Scared State");
         NextState();
     }
 

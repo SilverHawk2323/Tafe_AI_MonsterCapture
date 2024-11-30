@@ -33,6 +33,7 @@ public abstract class RaycastFromScreenCentre : MonoBehaviour
 
         if(Physics.Raycast(ray, out hit, maxDistance, hitLayer))
         {
+            Debug.Log(hit.collider.gameObject);
             return hit;
         }
 
@@ -40,6 +41,7 @@ public abstract class RaycastFromScreenCentre : MonoBehaviour
         hit.point = ray.origin + ray.direction * maxDistance;
 
         //then we can return the otherwise empty hit
+        Debug.Log("Hit Nothing");
         return hit;
     }
 }

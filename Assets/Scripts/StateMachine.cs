@@ -70,7 +70,7 @@ public class StateMachine : MonoBehaviour
     protected virtual IEnumerator PatrolState()
     {
         //Setup/entry point / Start()/Awake()
-        Debug.Log("Entering Patrol State");
+        //Debug.Log("Entering Patrol State");
 
 
         while(state == State.Patrol) // "Update loop"
@@ -108,7 +108,7 @@ public class StateMachine : MonoBehaviour
 
 
         //tear down/ exit point / OnDestroy()
-        Debug.Log("Exiting Patrol State");
+        //Debug.Log("Exiting Patrol State");
         NextState();
     }
 
@@ -137,7 +137,7 @@ public class StateMachine : MonoBehaviour
     protected virtual IEnumerator ChasingState()
     {
         //Setup/entry point / Start()/Awake()
-        Debug.Log("Entering Chase State");
+        //Debug.Log("Entering Chase State");
         _Agent.destination = player.transform.position;
 
         while (state == State.Chasing) // "Update loop"
@@ -155,7 +155,7 @@ public class StateMachine : MonoBehaviour
             Vector3 directionToPlayer = player.transform.position - transform.position;
             //directionToPlayer.Normalize();
 
-            float angle = Vector3.SignedAngle(transform.forward, directionToPlayer, Vector3.up);
+            /*float angle = Vector3.SignedAngle(transform.forward, directionToPlayer, Vector3.up);
 
             if (angle > 0)
             {
@@ -171,7 +171,7 @@ public class StateMachine : MonoBehaviour
             if(rb.velocity.magnitude > 2f)
             {
                 //rb.AddForce(transform.forward * shimmy, ForceMode.Acceleration);
-            }
+            }*/
 
             if(directionToPlayer.magnitude < 2f)
             {
@@ -187,14 +187,14 @@ public class StateMachine : MonoBehaviour
 
 
         //tear down/ exit point / OnDestroy()
-        Debug.Log("Exiting Chase State");
+        //Debug.Log("Exiting Chase State");
         NextState();
     }
 
     protected virtual IEnumerator AttackState()
     {
         //Setup/entry point / Start()/Awake()
-        Debug.Log("Entering Attack State");
+        //Debug.Log("Entering Attack State");
 
 
         while (state == State.Attack) // "Update loop"
@@ -213,14 +213,14 @@ public class StateMachine : MonoBehaviour
 
 
         //tear down/ exit point / OnDestroy()
-        Debug.Log("Exiting Attack State");
+        //Debug.Log("Exiting Attack State");
         NextState();
     }
 
     protected virtual IEnumerator CapturedState()
     {
         //Setup/entry point / Start()/Awake()
-        Debug.Log("Entering Captured State");
+        //Debug.Log("Entering Captured State");
         rb.freezeRotation = true;
         rb.constraints = RigidbodyConstraints.FreezeAll;
         _Agent.destination = transform.position;
@@ -231,7 +231,7 @@ public class StateMachine : MonoBehaviour
 
 
         //tear down/ exit point / OnDestroy()
-        Debug.Log("Exiting Captured State");
+        //Debug.Log("Exiting Captured State");
         //NextState();
     }
 
@@ -263,5 +263,6 @@ public class StateMachine : MonoBehaviour
     public void Captured()
     {
         state = State.Captured;
+        _Agent.destination = transform.position;
     }
 }
