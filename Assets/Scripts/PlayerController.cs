@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     Vector2 airDampVelocity;
     public Rigidbody rb;
     public LayerMask groundMask;
+    public GameObject pauseMenu;
 
     [SerializeField] Camera mc;
 
@@ -37,6 +38,27 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
+        {
+            if (Time.timeScale > 0f)
+            {
+                pauseMenu.SetActive(true);
+                Time.timeScale = 0f;
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+            else
+            {
+                pauseMenu.SetActive(false);
+                Time.timeScale = 1f;
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
+        if (Time.timeScale < 1f)
+        {
+            return;
+        }
         Jump();
         //Movement();
     }

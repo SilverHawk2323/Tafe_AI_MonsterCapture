@@ -36,6 +36,8 @@ public class CustomPlayerMovement : MonoBehaviour
 
     private CapsuleCollider capsuleCollider;
 
+    public GameObject pauseMenu;
+
     //The number of jumps the player currently has available
     private int jumpsRemaining;
 
@@ -51,6 +53,27 @@ public class CustomPlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
+        {
+            if (Time.timeScale > 0f)
+            {
+                pauseMenu.SetActive(true);
+                Time.timeScale = 0f;
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+            else
+            {
+                pauseMenu.SetActive(false);
+                Time.timeScale = 1f;
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+        }
+        if (Time.timeScale < 1f)
+        {
+            return;
+        }
         switch (currentState)
         {
             case State.Walk:

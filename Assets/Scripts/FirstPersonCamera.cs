@@ -47,6 +47,10 @@ public class FirstPersonCamera : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        if(Time.timeScale < 1)
+        {
+            return;
+        }
         GetRotationFromInput();
         ClampVerticalRotation();
         ApplyRotation();
