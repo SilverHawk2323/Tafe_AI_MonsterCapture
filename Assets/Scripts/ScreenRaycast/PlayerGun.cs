@@ -6,7 +6,8 @@ public class PlayerGun : RaycastFromScreenCentre
 {
     private DamageSource damageSource;
     private GunEffect effect;
-
+    Camera mainCamera => Camera.main;
+    public Vector3 hitPoint;
     protected override void Start()
     {
         //base. refers to the parent script
@@ -15,22 +16,32 @@ public class PlayerGun : RaycastFromScreenCentre
         damageSource = GetComponent<DamageSource>();
         effect = GetComponentInChildren<GunEffect>();
     }
-
     public void Shoot()
     {
         //if we hit something, hit.collider will have a value, else, hit.collider will be null
-        RaycastHit hit = TryToHit();
-
+        //RaycastHit hit = TryToHit();
+        RaycastHit hit;
         //if we did hit something
-        if (hit.collider)
+        Vector3 rayDir = mainCamera.transform.forward;
+        Vector3 rayOrigin = mainCamera.transform.position;
+        if (Physics.Raycast(rayOrigin, rayDir, out hit, maxDistance, hitLayer))
         {
             //if the thing we hit has a damagable component...
-            if(hit.rigidbody && hit.rigidbody.TryGetComponent<Damageable>(out Damageable agent))
+            Damageable damageable;
+            if(hit.collider.TryGetComponent<Damageable>(out damageable))
             {
-                agent.TakeDamage(damageSource.GetDamage());
+                damageable.TakeDamage(damageSource.GetDamage());
             }
         }
+        //Debug.LogError($"hit.collider={hit.collider}");
 
-        effect.Play(hit.point);
+        effect.Play(rayOrigin, hit.point);
+    }
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying)
+            return;
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawSphere(hitPoint, 0.5f);
     }
 }

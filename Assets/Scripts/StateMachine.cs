@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.AI;
 using TMPro;
@@ -52,7 +51,6 @@ public class StateMachine : MonoBehaviour
             case State.Chasing: 
                 StartCoroutine(ChasingState());
                 break;
-
             case State.Attack: 
                 StartCoroutine(AttackState());
                 break;
@@ -145,9 +143,9 @@ public class StateMachine : MonoBehaviour
             float wave = Mathf.Sin(Time.time * 15f) * 0.1f + 1f;
             float wave2 = Mathf.Cos(Time.time * 15f) * 0.1f + 1f;
 
-            transform.localScale = new Vector3(wave, wave2, wave);
+            //transform.localScale = new Vector3(wave, wave2, wave);
 
-            float shimmy = Mathf.Cos(Time.time * 30f) * 10f + 30f;
+            //float shimmy = Mathf.Cos(Time.time * 30f) * 10f + 30f;
             //Choose transform movement or rigidbody movement
             //_Agent.destination = player.transform.forward;
             //transform.position += transform.right * shimmy * Time.deltaTime;
@@ -201,7 +199,7 @@ public class StateMachine : MonoBehaviour
         {
             Vector3 scale = transform.localScale;
             scale.z = Mathf.Cos(Time.time * 20f) * 0.1f + 2f;
-            transform.localScale = scale;
+            //transform.localScale = scale;
 
             Vector3 directionToPlayer = player.transform.position - transform.position;
             if(directionToPlayer.magnitude > 3f)
@@ -210,7 +208,6 @@ public class StateMachine : MonoBehaviour
             }
             yield return null; // Wait for a frame
         }
-
 
         //tear down/ exit point / OnDestroy()
         //Debug.Log("Exiting Attack State");

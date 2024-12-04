@@ -12,11 +12,11 @@ public class GunEffect : MonoBehaviour
         line.enabled = false;
     }
 
-    public void Play(Vector3 hitposition)
+    public void Play(Vector3 origin, Vector3 hitposition)
     {
         StopCoroutine(StopAfterDelay());
         line.enabled = true;
-        line.SetPosition(0, transform.position);
+        line.SetPosition(0, origin);
         line.SetPosition(1, hitposition);
         StartCoroutine(StopAfterDelay());
     }
